@@ -1,42 +1,61 @@
-<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+<nav class="navbar is-transparent" role="navigation" aria-label="main dropdown navigation" x-data="{ burgerOpen: false }">
   <div class="navbar-brand">
-    <a class="navbar-item" href={{ "/" | relURL }}>
+
+    <a role="button" 
+      class="navbar-burger burger" 
+      aria-label="menu" 
+      x-bind:class="{ 'is-active': burgerOpen }" 
+      @click="burgerOpen = true" 
+      aria-expanded="false"
+    >
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+    <a class="navbar-item is-hidden-desktop" href={{ "/" | relURL }}>
       {{ with .Site.Title }}
       <strong>{{ . }} </strong>
       {{ end }}
     </a>
-
-    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
-      data-target="navbarBasicExample">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
   </div>
 
-  <div id="navbarBasicExample" class="navbar-menu">
-    <div class="navbar-start">
-      {{ range .Site.Menus.main }}
-      {{ if .HasChildren }}
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">{{- .Name -}}</a>
-        <div class="navbar-dropdown">
-          {{ range .Children }}
-          <a class="navbar-item" href="{{ .URL }}">
-            {{- .Name -}}
-          </a>
-          {{ end }}
-        </div>
-      </div>
-      {{ else }}
-      <a class="navbar-item" href="{{ .URL }}">
-        {{- .Name -}}
+  <div class="navbar-menu"
+    x-bind:class="{ 'is-active': burgerOpen }"
+    @click.away="burgerOpen = false"
+  >
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center; padding-left: 20%" id="mobileName">
+      <a class="navbar-item is-hidden-mobile" href={{ "/" | relURL }}>
+        {{ with .Site.Title }}
+        <strong>{{ . }} </strong>
+        {{ end }}
       </a>
-      {{ end }}
-      {{ end }}
     </div>
 
     <div class="navbar-end">
+      {{ range .Site.Menus.main }}
+        {{ if .HasChildren }}
+        <div class="navbar-item has-dropdown"
+          x-bind:class="{ 'is-active': blogOpen }"
+          x-data="{ blogOpen: false }"
+        >
+          <a class="navbar-link"
+            @click="blogOpen = !blogOpen"
+            @click.away="blogOpen = false"
+          >{{- .Name -}}</a>
+          <div class="navbar-dropdown is-boxed" x-bind:class="{ 'dropdown-link': !blogOpen }">
+            {{ range .Children }}
+            <a class="navbar-item" href="{{ .URL }}">
+              {{- .Name -}}
+            </a>
+            {{ end }}
+          </div>
+        </div>
+        {{ else }}
+        <a class="navbar-item" href="{{ .URL }}">
+          {{- .Name -}}
+        </a>
+        {{ end }}
+        {{ end }}
       {{ with .Site.Params.GithubProfile }}
       <a class="navbar-item navgithub" href="https://github.com/{{ . }}" target="_blank">
         <i class="fa fa-github fa-2x"></i>
